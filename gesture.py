@@ -8,6 +8,7 @@ from cvzone.HandTrackingModule import HandDetector
 import psutil
 import numpy as np
 from collections import deque
+from win32gui import GetWindowText, GetForegroundWindow
 
 
 thrd1 = None
@@ -79,6 +80,12 @@ class VideoShow:
     def stop(self):
         self.stopp = True
   
+
+def reset():
+    music_pressed = 0
+    yt_pressed = 0
+
+
 wCam, hCam = 1280, 580
 frameR = 100         #  frame Reduction
 smoothness = 6
@@ -88,7 +95,12 @@ lmlist = 0
 video_getter = VideoGet(0).start()
 video_shower = VideoShow(video_getter.img).start()
 
+detector = HandDetector(detectionCon=0.8,minTrackCon=0.6)
+
 while True:
+
+    current_window=GetWindowText(GetForegroundWindow()).lower()
+
     if (cv2.waitKey(1) == ord("q")) or video_getter.stopped:
         print('stopping')
         video_getter.stop() 
@@ -99,6 +111,47 @@ while True:
     # mediappe.start_detect(img)
     img = cv2.flip(img,1)
 
+    hands,img=detector.findHands(img,flipType=False)
 
+    if hands:
+        hand = hands[0]
+        lmlist = hand["lmList"]
+        hand_Type = hand["type"]
+        if lmlist == 0:
+            time.sleep(0.003)
+            lmlist = 1
+        if start_timer is not None:
+            tm = (time.time())-start_timer
+            
+            start_timer = None
+        
+        fingers = detector.fingersUp(hand)
+        cv2.rectangle(img, (frameR, 5),(wCam-frameR,hCam-frameR),(255,0,255),2)
+        fings_up = [x for x in range(len(fingers)) if fingers[x]==1 and x != 0]
+
+
+        if fingers[1] == 1 and fingers[0] == 0 and fingers[2] == 0 and fingers[3] == 0 and fingers[4] == 1:
+            pressed = 0
+            print('in play-pause')
+            if fingers[0] == 0 and fingers[1] == 1 and fingers[4] == 1 and fingers[2] == 0 and fingers[3] == 0 :
+                # print('clicking play')
+                if yt_pressed == 0 or music_pressed == 0:
+                    keyboard.press_and_release('play/pause media')
+                    print('pressed A    N   Y   music')
+                    yt_pressed = 1
+                    music_pressed = 1
+            
+            if ('youtube' in current_window or 'groove' in current_window or 'vlc' in current_window) and fingers[0] == 0 and fingers[1] == 1 and fingers[4] == 1 and fingers[2] == 0 and fingers[3] == 0:
+                
+                
+                if 'youtube' in current_window and yt_pressed == 0:
+                    print('pressed yt')
+                    keyboard.press_and_release('k')
+                    yt_pressed = 1
+                if 'groove' in current_window and music_pressed == 0 or 'vlc' in current_window:
+                    keyboard.press_and_release('space')
+                    music_pressed = 1
+                    print('pressed any music')
+ 
 
     video_shower.img = img

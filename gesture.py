@@ -130,6 +130,8 @@ while True:
         fings_up = [x for x in range(len(fingers)) if fingers[x]==1 and x != 0]
 
 
+        prev_length, lineInfo_next_trak,img = detector.findDistance(lmlist[4][0:2],lmlist[17][0:2],img)
+
         if fingers[1] == 1 and fingers[0] == 0 and fingers[2] == 0 and fingers[3] == 0 and fingers[4] == 1:
             pressed = 0
             print('in play-pause')
@@ -153,5 +155,23 @@ while True:
                     music_pressed = 1
                     print('pressed any music')
  
+
+            ###############################################################
+            ##          playback CONTROL
+            ###############################################################
+
+        
+        if fingers[0]==1 and (fingers[1] and fingers[2] and fingers[3] and fingers[4]) == 1 and prev_length<=30: 
+            pressed_prev = 0
+            if next_pressed==0:
+                keyboard.press_and_release('next_track')
+                next_pressed=1
+
+
+        if fingers[0] == 1 and len(fings_up)==0:
+            next_pressed = 0 
+            if pressed_prev==0:
+                keyboard.press_and_release('previous_track')
+                pressed_prev=1
 
     video_shower.img = img

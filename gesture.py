@@ -9,7 +9,7 @@ import psutil
 import numpy as np
 from collections import deque
 from win32gui import GetWindowText, GetForegroundWindow
-
+import volume_controller as vc
 
 thrd1 = None
  
@@ -80,6 +80,15 @@ class VideoShow:
     def stop(self):
         self.stopp = True
   
+
+
+def vol(img,detector,fingers,cap):
+    volume_controller.set_volume(img, detector,fingers,cap) 
+
+    print('thread ended')
+
+
+volume_controller = vc.volume()
 
 def reset():
     music_pressed = 0
@@ -173,5 +182,26 @@ while True:
             if pressed_prev==0:
                 keyboard.press_and_release('previous_track')
                 pressed_prev=1
+
+    
+            ###############################################################
+            ##          VOLUME CONTROL
+            ###############################################################
+ 
+        if fingers[0] == 0 and fingers[1]==1 and fingers[4] == 0 and fingers[2]==0 and fingers[3]==0:
+            print("in volume")
+            pressed = 0
+            screenshotted = 0
+            yt_pressed = 0
+            music_pressed = 0
+            next_pressed = 0 
+            pressed_prev = 0
+            # dqX.clear()
+            # dqY.clear()
+            clear=1
+            thrd1 = threading.Thread(target=vol,args=(img, detector,fingers,cap))
+            thrd1.start()
+            thrd1.join()
+            print('rejoin')
 
     video_shower.img = img

@@ -10,6 +10,7 @@ import numpy as np
 from collections import deque
 from win32gui import GetWindowText, GetForegroundWindow
 import volume_controller as vc
+import brightness_control as bc
 
 thrd1 = None
  
@@ -84,11 +85,18 @@ class VideoShow:
 
 def vol(img,detector,fingers,cap):
     volume_controller.set_volume(img, detector,fingers,cap) 
-
     print('thread ended')
+
+    
+def bright(img,detector,fingers,cap):
+    brightness_control.set_brightness(img,detector,fingers,cap)
+    print('brightness set')
+
 
 
 volume_controller = vc.volume()
+brightness_control = bc.brightness()
+
 
 def reset():
     music_pressed = 0
@@ -203,5 +211,27 @@ while True:
             thrd1.start()
             thrd1.join()
             print('rejoin')
+
+
+            ###############################################################
+            ##          BRIGHTNESS CONTROL
+            ###############################################################
+
+        if fingers[0] == 0 and fingers[1]==1 and fingers[4] == 0 and fingers[2]==1 and fingers[3]==0 and fingers[0] != 1:
+            pressed = 0
+            yt_pressed = 0
+            music_pressed = 0
+            screenshotted = 0
+            next_pressed = 0 
+            pressed_prev = 0
+            # dqX.clear()
+            # dqY.clear()
+            clear=1
+            thrd1 = threading.Thread(target=bright,args=(img, detector,fingers,cap))
+            thrd1.start()
+            thrd1.join()
+            print('rejoin')
+
+
 
     video_shower.img = img

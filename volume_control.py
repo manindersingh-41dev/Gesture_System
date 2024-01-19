@@ -75,7 +75,6 @@ class volume():
 
                         if fingers[0] == 0 and fingers[1]==1 and fingers[4] == 0 and fingers[2]==0 and fingers[3]==0:
                             try:
-                                print("Setting volume")
                                 volume.SetMasterVolumeLevelScalar(volperc/100,None)
                                 
                             except Exception:

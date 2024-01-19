@@ -1,11 +1,17 @@
+from threading import Thread
+import threading
 import cv2
+import time
 import keyboard
 import mediapipe as mp
+# import hand_Detection_module as htm
+import psutil
 import numpy as np
 from collections import deque
 from win32gui import GetWindowText, GetForegroundWindow
 thrd1 = None
-
+import pyautogui
+from cvzone.HandTrackingModule import HandDetector
 
 class presentation_control():
     def __init__(self,mode=False, maxHands=1, detectionCon =0.75, minTrackCon = 0.6):
